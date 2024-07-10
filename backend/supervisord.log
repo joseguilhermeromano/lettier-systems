@@ -30,3 +30,80 @@
 2024-07-10 14:31:44,978 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
 2024-07-10 14:36:17,528 INFO reaped unknown pid 32 (exit status 0)
 2024-07-10 14:36:52,575 INFO reaped unknown pid 34 (exit status 0)
+2024-07-10 14:56:49,078 WARN received SIGQUIT indicating exit request
+2024-07-10 14:56:49,079 INFO waiting for nginx, php-fpm to die
+2024-07-10 14:56:49,086 INFO stopped: php-fpm (exit status 0)
+2024-07-10 14:56:49,197 INFO stopped: nginx (exit status 0)
+2024-07-10 14:58:20,757 INFO Set uid to user 0 succeeded
+2024-07-10 14:58:20,781 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2024-07-10 14:58:20,789 INFO supervisord started with pid 1
+2024-07-10 14:58:21,803 INFO spawned: 'nginx' with pid 15
+2024-07-10 14:58:21,889 INFO spawned: 'php-fpm' with pid 16
+2024-07-10 14:58:23,196 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 14:58:23,197 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 15:05:12,390 WARN received SIGQUIT indicating exit request
+2024-07-10 15:05:12,391 INFO waiting for nginx, php-fpm to die
+2024-07-10 15:05:12,397 INFO stopped: php-fpm (exit status 0)
+2024-07-10 15:05:12,516 INFO stopped: nginx (exit status 0)
+2024-07-10 15:06:36,698 INFO Set uid to user 0 succeeded
+2024-07-10 15:06:36,703 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2024-07-10 15:06:36,706 INFO supervisord started with pid 1
+2024-07-10 15:06:37,709 INFO spawned: 'nginx' with pid 8
+2024-07-10 15:06:37,711 INFO spawned: 'php-fpm' with pid 9
+2024-07-10 15:06:38,737 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 15:06:38,738 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 15:08:58,363 WARN received SIGQUIT indicating exit request
+2024-07-10 15:08:58,364 INFO waiting for nginx, php-fpm to die
+2024-07-10 15:08:58,373 INFO stopped: php-fpm (exit status 0)
+2024-07-10 15:08:58,545 INFO stopped: nginx (exit status 0)
+2024-07-10 15:15:32,761 INFO Set uid to user 0 succeeded
+2024-07-10 15:15:32,781 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2024-07-10 15:15:32,791 INFO supervisord started with pid 1
+2024-07-10 15:15:33,797 INFO spawned: 'nginx' with pid 16
+2024-07-10 15:15:33,821 INFO spawned: 'php-fpm' with pid 17
+2024-07-10 15:15:34,918 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 15:15:34,924 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 16:02:53,722 WARN received SIGQUIT indicating exit request
+2024-07-10 16:02:53,725 INFO waiting for nginx, php-fpm to die
+2024-07-10 16:02:53,749 INFO stopped: php-fpm (exit status 0)
+2024-07-10 16:02:53,853 INFO stopped: nginx (exit status 0)
+2024-07-10 16:03:15,758 INFO Set uid to user 0 succeeded
+2024-07-10 16:03:15,768 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2024-07-10 16:03:15,772 INFO supervisord started with pid 1
+2024-07-10 16:03:16,778 INFO spawned: 'nginx' with pid 10
+2024-07-10 16:03:16,801 INFO spawned: 'php-fpm' with pid 11
+2024-07-10 16:03:17,861 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 16:03:17,862 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 16:03:55,175 WARN received SIGQUIT indicating exit request
+2024-07-10 16:03:55,177 INFO waiting for nginx, php-fpm to die
+2024-07-10 16:03:55,188 INFO stopped: php-fpm (exit status 0)
+2024-07-10 16:03:55,344 INFO stopped: nginx (exit status 0)
+2024-07-10 16:04:14,607 INFO Set uid to user 0 succeeded
+2024-07-10 16:04:14,611 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2024-07-10 16:04:14,614 INFO supervisord started with pid 1
+2024-07-10 16:04:15,619 INFO spawned: 'nginx' with pid 9
+2024-07-10 16:04:15,626 INFO spawned: 'php-fpm' with pid 10
+2024-07-10 16:04:16,661 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 16:04:16,661 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 17:19:39,111 WARN received SIGQUIT indicating exit request
+2024-07-10 17:19:39,116 INFO waiting for nginx, php-fpm to die
+2024-07-10 17:19:39,150 INFO stopped: php-fpm (exit status 0)
+2024-07-10 17:19:39,361 INFO stopped: nginx (exit status 0)
+2024-07-10 17:20:11,777 INFO Set uid to user 0 succeeded
+2024-07-10 17:20:11,789 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2024-07-10 17:20:11,791 INFO supervisord started with pid 1
+2024-07-10 17:20:12,795 INFO spawned: 'nginx' with pid 16
+2024-07-10 17:20:12,805 INFO spawned: 'php-fpm' with pid 17
+2024-07-10 17:20:13,861 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 17:20:13,861 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 17:26:14,600 WARN received SIGQUIT indicating exit request
+2024-07-10 17:26:14,601 INFO waiting for nginx, php-fpm to die
+2024-07-10 17:26:15,611 INFO stopped: php-fpm (exit status 0)
+2024-07-10 17:26:15,800 INFO stopped: nginx (exit status 0)
+2024-07-10 17:26:35,408 INFO Set uid to user 0 succeeded
+2024-07-10 17:26:35,416 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2024-07-10 17:26:35,419 INFO supervisord started with pid 1
+2024-07-10 17:26:36,423 INFO spawned: 'nginx' with pid 10
+2024-07-10 17:26:36,431 INFO spawned: 'php-fpm' with pid 11
+2024-07-10 17:26:37,461 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2024-07-10 17:26:37,461 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
