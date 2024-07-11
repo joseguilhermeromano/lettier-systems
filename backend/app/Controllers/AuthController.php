@@ -41,6 +41,7 @@ class AuthController extends ResourceController
 
     public function login()
     {
+        $session = session();
         $rules = [
             'email'    => 'required|valid_email',
             'password' => 'required|min_length[6]'
@@ -56,6 +57,13 @@ class AuthController extends ResourceController
         if (!$user || !password_verify($this->request->getVar('password'), $user['password'])) {
             return $this->failUnauthorized('Invalid credentials');
         }
+
+        $ses_data = [
+            'id' => $user['id'],
+            'email' => $user['email'],
+            'isLoggedIn' => true
+        ];
+        $session->set($ses_data);
 
         $token = bin2hex(random_bytes(64));
         $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
@@ -83,6 +91,10 @@ class AuthController extends ResourceController
     //crie o método logout
     public function logout()
     {
+        $session = session();
+
+        $session->destroy();
+
         $authHeader = $this->request->header('Authorization');
         if (!$authHeader) {
             return $this->failUnauthorized('Authorization header not found');
