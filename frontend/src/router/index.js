@@ -3,6 +3,7 @@ import routes from "./routes";
 
 // configure router
 const router = new VueRouter({
+  mode: "history",
   routes, // short for routes: routes
   linkExactActiveClass: "active",
   scrollBehavior: (to) => {
@@ -15,15 +16,9 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const loggedIn = true;
-  console.log(to);
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (!loggedIn) {
-      next("/login");
-    } else {
-      console.log("caiu aqui...");
-      next();
-    }
+  const token = localStorage.getItem("token");
+  if (to.matched.some((record) => record.meta.requiresAuth) && !token) {
+    next({ name: "login" });
   } else {
     next();
   }

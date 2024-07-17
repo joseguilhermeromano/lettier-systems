@@ -67,12 +67,20 @@ export default {
   },
   mounted() {
     this.adjustDropdownPosition();
+    const theme = localStorage.getItem("theme");
+    if (theme === "dark") {
+      this.setDarkMode();
+    } else {
+      this.setLightMode();
+    }
   },
   methods: {
     setLightMode() {
+      localStorage.setItem("theme", "light");
       document.body.classList.add("white-content");
     },
     setDarkMode() {
+      localStorage.setItem("theme", "dark");
       document.body.classList.remove("white-content");
     },
     adjustDropdownPosition() {

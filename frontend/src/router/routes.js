@@ -36,7 +36,7 @@ const routes = [
     component: Login,
   },
   {
-    path: "/dashboard",
+    path: "/",
     component: DashboardLayout,
     redirect: "/dashboard",
     meta: { requiresAuth: true },

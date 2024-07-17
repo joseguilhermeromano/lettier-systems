@@ -43,10 +43,19 @@ export default {
     };
   },
   methods: {
-    login() {
-      // Adicione sua lógica de login aqui
-      console.log("Email:", this.email);
-      console.log("Password:", this.password);
+    async login() {
+      try {
+        const response = await this.$http.post("/login", {
+          email: this.email,
+          password: this.password,
+        });
+        const token = response.data.token;
+        localStorage.setItem("token", token);
+        localStorage.setItem("theme", "light");
+        this.$router.push({ name: "dashboard" });
+      } catch (err) {
+        this.error = "Email ou senha incorretos";
+      }
     },
   },
 };

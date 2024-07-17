@@ -29,7 +29,7 @@ class Database extends Config
         'hostname'     => 'db',
         'username'     => 'root',
         'password'     => '12345678',
-        'database'     => 'lettier',
+        'database'     => 'lettiere',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,

@@ -92,7 +92,9 @@
                 <p class="d-lg-none">Log out</p>
               </a>
               <li class="nav-link">
-                <a href="#" class="nav-item dropdown-item">Sair</a>
+                <a href="#" @click="logout()" class="nav-item dropdown-item"
+                  >Sair</a
+                >
               </li>
             </base-dropdown>
           </ul>
@@ -145,6 +147,10 @@ export default {
     },
     toggleMenu() {
       this.showMenu = !this.showMenu;
+    },
+    logout() {
+      localStorage.removeItem("token");
+      this.$router.push({ name: "login" });
     },
   },
 };

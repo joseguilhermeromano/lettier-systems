@@ -22,6 +22,11 @@ import BlackDashboard from "./plugins/blackDashboard";
 import i18n from "./i18n";
 import "./registerServiceWorker";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import axios from "./axios"; // Importa a configuração do Axios
+import $ from "jquery";
+
+Vue.prototype.$http = axios; // Torna a instância do Axios acessível através de $http
+window.$ = $;
 
 Vue.use(BlackDashboard);
 Vue.use(VueRouter);
