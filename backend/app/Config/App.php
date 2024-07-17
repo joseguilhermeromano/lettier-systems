@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'http://localhost:8080/';
+    public string $baseURL = 'http://lettiere.app.br/api';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
@@ -200,11 +200,19 @@ class App extends BaseConfig
      */
     public bool $CSPEnabled = false;
 
-    public $sessionDriver = 'CodeIgniter\Session\Handlers\DatabaseHandler';
-    public $sessionCookieName = 'ci_session';
-    public $sessionExpiration = 7200;
-    public $sessionSavePath = null;
-    public $sessionMatchIP = false;
-    public $sessionTimeToUpdate = 300;
+    // public $sessionDriver = 'CodeIgniter\Session\Handlers\DatabaseHandler';
+    // public $sessionCookieName = 'ci_session';
+    // public $sessionExpiration = 7200;
+    // public $sessionSavePath = null;
+    // public $sessionMatchIP = false;
+    // public $sessionTimeToUpdate = 300;
+    // public $sessionRegenerateDestroy = false;
+
+    public $sessionDriver            = 'CodeIgniter\Session\Handlers\DatabaseHandler';
+    public $sessionCookieName        = 'ci_session';
+    public $sessionExpiration        = 7200;
+    public $sessionSavePath          = 'ci_sessions';
+    public $sessionMatchIP           = false;
+    public $sessionTimeToUpdate      = 300;
     public $sessionRegenerateDestroy = false;
 }

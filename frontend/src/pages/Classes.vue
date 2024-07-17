@@ -1,5 +1,15 @@
 <template>
   <div class="content">
+    <!-- Alerta de Notificação no Topo -->
+    <base-alert
+      v-if="alert.visible"
+      :type="alert.type"
+      dismissible
+      @dismiss="alert.visible = false"
+      class="alert-top"
+    >
+      {{ alert.message }}
+    </base-alert>
     <div class="container-fluid">
       <div class="row">
         <div class="col-12">
@@ -33,13 +43,13 @@
                     <th @click="setSortColumn('name')">
                       Nome <i class="fas" :class="sortIcon('name')"></i>
                     </th>
-                    <th @click="setSortColumn('start_date')">
-                      Data de Início
-                      <i class="fas" :class="sortIcon('start_date')"></i>
+                    <th @click="setSortColumn('start_time')">
+                      Horário de Início
+                      <i class="fas" :class="sortIcon('start_time')"></i>
                     </th>
-                    <th @click="setSortColumn('end_date')">
-                      Data Final
-                      <i class="fas" :class="sortIcon('end_date')"></i>
+                    <th @click="setSortColumn('end_time')">
+                      Horário de Término
+                      <i class="fas" :class="sortIcon('end_time')"></i>
                     </th>
                     <th class="text-center">Ações</th>
                   </tr>
@@ -47,8 +57,8 @@
                 <tbody>
                   <tr v-for="classItem in paginatedClasses" :key="classItem.id">
                     <td>{{ classItem.name }}</td>
-                    <td>{{ classItem.start_date }}</td>
-                    <td>{{ classItem.end_date }}</td>
+                    <td>{{ classItem.start_time }}</td>
+                    <td>{{ classItem.end_time }}</td>
                     <td class="text-center">
                       <a href="#" @click.prevent="viewClass(classItem)">
                         <i
@@ -140,8 +150,11 @@
       </template>
       <div v-if="selectedClass">
         <p><strong>Nome:</strong> {{ selectedClass.name }}</p>
-        <p><strong>Data de Início:</strong> {{ selectedClass.start_date }}</p>
-        <p><strong>Data Final:</strong> {{ selectedClass.end_date }}</p>
+        <p>
+          <strong>Horário de Início:</strong>
+          {{ selectedClass.start_time }}
+        </p>
+        <p><strong>Horário de Término:</strong> {{ selectedClass.end_time }}</p>
       </div>
       <template slot="footer">
         <base-button type="secondary" @click="modals.viewClass = false"
@@ -153,45 +166,14 @@
 </template>
 
 <script>
-import { Card, Modal } from "@/components/index";
-
-const classes = [
-  {
-    id: 1,
-    name: "Turma 1",
-    start_date: "2024-01-01",
-    end_date: "2024-01-31",
-  },
-  {
-    id: 2,
-    name: "Turma 2",
-    start_date: "2024-02-01",
-    end_date: "2024-02-28",
-  },
-  {
-    id: 3,
-    name: "Turma 3",
-    start_date: "2024-03-01",
-    end_date: "2024-03-31",
-  },
-  {
-    id: 4,
-    name: "Turma 4",
-    start_date: "2024-04-01",
-    end_date: "2024-04-30",
-  },
-  {
-    id: 5,
-    name: "Turma 5",
-    start_date: "2024-05-01",
-    end_date: "2024-05-31",
-  },
-];
+import { Card, BaseAlert, Modal } from "@/components/index";
+import axios from "@/axios";
 
 export default {
   name: "classes",
   components: {
     Card,
+    BaseAlert,
     Modal,
   },
   data() {
@@ -199,13 +181,18 @@ export default {
       classesTable: {
         title: "Turmas",
         subTitle: "Listagem de turmas",
-        columns: ["Name", "Start Date", "End Date"],
-        data: classes,
+        columns: ["Name", "Start Time", "End Time"],
+        data: [],
       },
       filters: {
         search: "",
         sortColumn: null,
         sortDirection: "asc",
+      },
+      alert: {
+        visible: false,
+        type: "success",
+        message: "",
       },
       perPage: 10,
       currentPage: 1,
@@ -226,10 +213,10 @@ export default {
             classItem.name
               .toLowerCase()
               .includes(this.filters.search.toLowerCase()) ||
-            classItem.start_date
+            classItem.start_time
               .toLowerCase()
               .includes(this.filters.search.toLowerCase()) ||
-            classItem.end_date
+            classItem.end_time
               .toLowerCase()
               .includes(this.filters.search.toLowerCase())
         );
@@ -257,6 +244,24 @@ export default {
     },
   },
   methods: {
+    loadClasses() {
+      axios
+        .get("/classes/list")
+        .then((response) => {
+          this.classesTable.data = response.data;
+        })
+        .catch((error) => {
+          console.error("Não foi possível carregar as turmas.", error);
+        });
+    },
+    showAlert(message, type = "success") {
+      this.alert.message = message;
+      this.alert.type = type;
+      this.alert.visible = true;
+      setTimeout(() => {
+        this.alert.visible = false;
+      }, 3000);
+    },
     viewClass(classItem) {
       this.selectedClass = classItem;
       this.modals.viewClass = true;
@@ -265,11 +270,19 @@ export default {
       // Implement edit class action
     },
     deleteClass(classItem) {
-      // Implement delete class action
-      this.classesTable.data = this.classesTable.data.filter(
-        (u) => u.id !== classItem.id
-      );
-      this.modals.confirmDelete = false;
+      axios
+        .delete(`/classes/delete/${classItem.id}`)
+        .then(() => {
+          this.classesTable.data = this.classesTable.data.filter(
+            (u) => u.id !== classItem.id
+          );
+          this.modals.confirmDelete = false;
+          this.showAlert("Turma excluída com sucesso!", "success");
+        })
+        .catch((error) => {
+          console.error("Erro ao tentar remover uma turma", error);
+          this.showAlert("Erro ao excluir uma turma", "danger");
+        });
     },
     confirmDeleteClass(classItem) {
       this.selectedClass = classItem;
@@ -312,6 +325,9 @@ export default {
       }
       return "fa-sort";
     },
+  },
+  mounted() {
+    this.loadClasses();
   },
 };
 </script>

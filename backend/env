@@ -97,10 +97,9 @@ database.default.port = 3306
 # SESSION
 
 #--------------------------------------------------------------------
+sessionDriver = 'CodeIgniter\Session\Handlers\DatabaseHandler'
+sessionSavePath = 'ci_sessions'
 
-# session.driver = 'CodeIgniter\Session\Handlers\FileHandler'
-
-# session.savePath = null
 
 #--------------------------------------------------------------------
 

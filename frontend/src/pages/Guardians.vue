@@ -1,5 +1,15 @@
 <template>
   <div class="content">
+    <!-- Alerta de Notificação no Topo -->
+    <base-alert
+      v-if="alert.visible"
+      :type="alert.type"
+      dismissible
+      @dismiss="alert.visible = false"
+      class="alert-top"
+    >
+      {{ alert.message }}
+    </base-alert>
     <div class="container-fluid">
       <div class="row">
         <div class="col-12">
@@ -54,8 +64,8 @@
                   <tr v-for="guardian in paginatedGuardians" :key="guardian.id">
                     <td>{{ guardian.name }}</td>
                     <td>{{ guardian.email }}</td>
-                    <td>{{ guardian.phone_number }}</td>
-                    <td>{{ guardian.relationship }}</td>
+                    <td>{{ formatPhoneNumber(guardian.phone_number) }}</td>
+                    <td>{{ translateRelationship(guardian.relationship) }}</td>
                     <td class="text-center">
                       <a href="#" @click.prevent="viewGuardian(guardian)">
                         <i
@@ -148,8 +158,14 @@
       <div v-if="selectedGuardian">
         <p><strong>Nome:</strong> {{ selectedGuardian.name }}</p>
         <p><strong>Email:</strong> {{ selectedGuardian.email }}</p>
-        <p><strong>Telefone:</strong> {{ selectedGuardian.phone_number }}</p>
-        <p><strong>Parentesco:</strong> {{ selectedGuardian.relationship }}</p>
+        <p>
+          <strong>Telefone:</strong>
+          {{ formatPhoneNumber(selectedGuardian.phone_number) }}
+        </p>
+        <p>
+          <strong>Parentesco:</strong>
+          {{ translateRelationship(selectedGuardian.relationship) }}
+        </p>
       </div>
       <template slot="footer">
         <base-button type="secondary" @click="modals.viewGuardian = false"
@@ -161,50 +177,14 @@
 </template>
 
 <script>
-import { Card, Modal } from "@/components/index";
-
-const guardians = [
-  {
-    id: 1,
-    name: "João da Silva",
-    email: "joao@silva.com",
-    phone_number: "(11) 1234-5678",
-    relationship: "Pai",
-  },
-  {
-    id: 2,
-    name: "Maria da Costa",
-    email: "maria@costa.com",
-    phone_number: "(11) 2345-6789",
-    relationship: "Mãe",
-  },
-  {
-    id: 3,
-    name: "Pedro da Cunha",
-    email: "pedro@cunha.com",
-    phone_number: "(11) 3456-7890",
-    relationship: "Tio",
-  },
-  {
-    id: 4,
-    name: "Ana da Silva",
-    email: "ana@silva.com",
-    phone_number: "(11) 4567-8901",
-    relationship: "Mãe",
-  },
-  {
-    id: 5,
-    name: "José da Costa",
-    email: "jose@costa.com",
-    phone_number: "(11) 5678-9012",
-    relationship: "Pai",
-  },
-];
+import { Card, BaseAlert, Modal } from "@/components/index";
+import axios from "@/axios";
 
 export default {
   name: "guardians",
   components: {
     Card,
+    BaseAlert,
     Modal,
   },
   data() {
@@ -213,7 +193,7 @@ export default {
         title: "Pais/Responsáveis",
         subTitle: "Listagem de pais/responsáveis",
         columns: ["Name", "Email", "Phone Number", "Relationship"],
-        data: guardians,
+        data: [],
       },
       filters: {
         search: "",
@@ -227,7 +207,15 @@ export default {
         viewGuardian: false,
       },
       selectedGuardian: null,
+      alert: {
+        visible: false,
+        type: "",
+        message: "",
+      },
     };
+  },
+  created() {
+    this.fetchGuardians();
   },
   computed: {
     filteredGuardians() {
@@ -245,7 +233,7 @@ export default {
             guardian.phone_number
               .toLowerCase()
               .includes(this.filters.search.toLowerCase()) ||
-            guardian.relationship
+            this.translateRelationship(guardian.relationship)
               .toLowerCase()
               .includes(this.filters.search.toLowerCase())
         );
@@ -273,6 +261,36 @@ export default {
     },
   },
   methods: {
+    fetchGuardians() {
+      axios
+        .get("/guardians/list")
+        .then((response) => {
+          this.guardiansTable.data = response.data;
+        })
+        .catch((error) => {
+          console.error("Não foi possível carregar os responsáveis.", error);
+        });
+    },
+    formatPhoneNumber(phoneNumber) {
+      // Format the phone number as desired, e.g., (XX) XXXX-XXXX
+      return phoneNumber.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+    },
+    translateRelationship(relationship) {
+      const relationships = {
+        father: "Pai",
+        mother: "Mãe",
+        brother: "Irmão",
+        sister: "Irmã",
+        uncle: "Tio",
+        aunt: "Tia",
+        grandfather: "Avô",
+        grandmother: "Avó",
+        cousin: "Primo",
+        other: "Outro",
+        guardian: "Responsável",
+      };
+      return relationships[relationship] || relationship;
+    },
     viewGuardian(guardian) {
       this.selectedGuardian = guardian;
       this.modals.viewGuardian = true;
@@ -281,11 +299,19 @@ export default {
       // Implement edit guardian action
     },
     deleteGuardian(guardian) {
-      // Implement delete guardian action
-      this.guardiansTable.data = this.guardiansTable.data.filter(
-        (u) => u.id !== guardian.id
-      );
-      this.modals.confirmDelete = false;
+      axios
+        .delete(`/guardians/delete/${guardian.id}`)
+        .then(() => {
+          this.guardiansTable.data = this.guardiansTable.data.filter(
+            (u) => u.id !== guardian.id
+          );
+          this.modals.confirmDelete = false;
+          this.showAlert("Responsável excluído com sucesso!", "success");
+        })
+        .catch((error) => {
+          console.error("Erro ao tentar remover um responsável", error);
+          this.showAlert("Erro ao excluir um responsável", "danger");
+        });
     },
     confirmDeleteGuardian(guardian) {
       this.selectedGuardian = guardian;
@@ -327,6 +353,14 @@ export default {
           : "fa-sort-down";
       }
       return "fa-sort";
+    },
+    showAlert(message, type) {
+      this.alert.message = message;
+      this.alert.type = type;
+      this.alert.visible = true;
+      setTimeout(() => {
+        this.alert.visible = false;
+      }, 3000);
     },
   },
 };

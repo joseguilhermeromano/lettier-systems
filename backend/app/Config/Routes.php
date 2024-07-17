@@ -8,6 +8,9 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 
 $routes->group('api', function ($routes) {
+    $routes->get('/', function () {
+        return json_encode(['success' => true, 'message' => 'Seja bem vindo a API Lettiere!']);
+    });
     $routes->post('login', 'AuthController::login', ['as' => 'login']);
     $routes->post('logout', 'AuthController::logout');
     $routes->get('user', 'AuthController::user');
@@ -51,5 +54,12 @@ $routes->group('api', function ($routes) {
         $routes->delete('delete/(:num)', 'StudentController::delete/$1');
         $routes->get('details/(:num)', 'StudentController::details/$1');
         $routes->get('list', 'StudentController::list');
+    });
+
+    $routes->group('users', ['namespace' => 'App\Controllers', 'filter' => 'auth'], function ($routes) {
+        $routes->put('update/(:num)', 'UserController::update/$1');
+        $routes->delete('delete/(:num)', 'UserController::delete/$1');
+        $routes->get('details/(:num)', 'UserController::details/$1');
+        $routes->get('list', 'UserController::list');
     });
 });

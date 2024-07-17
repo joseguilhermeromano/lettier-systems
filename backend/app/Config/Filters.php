@@ -30,11 +30,11 @@ class Filters extends BaseFilters
         'honeypot'      => Honeypot::class,
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
-        'cors'          => Cors::class,
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'auth'          => \App\Filters\AuthFilter::class,
+        'cors'          => \App\Filters\Cors::class,
     ];
 
     /**
@@ -74,11 +74,12 @@ class Filters extends BaseFilters
             // 'csrf',
             // 'invalidchars',
             'cors',
+            'auth' => ['except' => ['login', 'register']]
         ],
         'after' => [
-            'cors',
             // 'honeypot',
             // 'secureheaders',
+            'cors',
         ],
     ];
 
@@ -108,5 +109,9 @@ class Filters extends BaseFilters
      */
     public array $filters = [
         'auth' => ['before' => ['api/courses/*']],
+        'cors' => [
+            'before' => ['api/*'],
+            'after'  => ['api/*'],
+        ],
     ];
 }

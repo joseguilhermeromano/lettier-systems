@@ -1,5 +1,15 @@
 <template>
   <div class="content">
+    <!-- Alerta de Notificação no Topo -->
+    <base-alert
+      v-if="alert.visible"
+      :type="alert.type"
+      dismissible
+      @dismiss="alert.visible = false"
+      class="alert-top"
+    >
+      {{ alert.message }}
+    </base-alert>
     <div class="container-fluid">
       <div class="row">
         <div class="col-12">
@@ -52,8 +62,8 @@
                   <tr v-for="course in paginatedCourses" :key="course.id">
                     <td>{{ course.name }}</td>
                     <td>{{ course.description }}</td>
-                    <td>{{ course.start_date }}</td>
-                    <td>{{ course.end_date }}</td>
+                    <td>{{ formatDate(course.start_date) }}</td>
+                    <td>{{ formatDate(course.end_date) }}</td>
                     <td class="text-center">
                       <a href="#" @click.prevent="viewCourse(course)">
                         <i
@@ -143,8 +153,13 @@
       <div v-if="selectedCourse">
         <p><strong>Nome:</strong> {{ selectedCourse.name }}</p>
         <p><strong>Descrição:</strong> {{ selectedCourse.description }}</p>
-        <p><strong>Data de Início:</strong> {{ selectedCourse.start_date }}</p>
-        <p><strong>Data Final:</strong> {{ selectedCourse.end_date }}</p>
+        <p>
+          <strong>Data de Início:</strong>
+          {{ formatDate(selectedCourse.start_date) }}
+        </p>
+        <p>
+          <strong>Data Final:</strong> {{ formatDate(selectedCourse.end_date) }}
+        </p>
       </div>
       <template slot="footer">
         <base-button type="secondary" @click="modals.viewCourse = false"
@@ -156,51 +171,16 @@
 </template>
 
 <script>
-import { Card, Modal } from "@/components/index";
-
-const courses = [
-  {
-    id: 1,
-    name: "Introdução à Programação",
-    description: "Curso básico de programação.",
-    start_date: "2024-01-01",
-    end_date: "2024-01-31",
-  },
-  {
-    id: 2,
-    name: "Desenvolvimento Web",
-    description: "Curso avançado de desenvolvimento web.",
-    start_date: "2024-02-01",
-    end_date: "2024-02-28",
-  },
-  {
-    id: 3,
-    name: "Banco de Dados",
-    description: "Curso intermediário de bancos de dados.",
-    start_date: "2024-03-01",
-    end_date: "2024-03-31",
-  },
-  {
-    id: 4,
-    name: "Engenharia de Software",
-    description: "Curso completo de engenharia de software.",
-    start_date: "2024-04-01",
-    end_date: "2024-04-30",
-  },
-  {
-    id: 5,
-    name: "Inteligência Artificial",
-    description: "Curso introdutório de inteligência artificial.",
-    start_date: "2024-05-01",
-    end_date: "2024-05-31",
-  },
-];
+import { Card, Modal, BaseAlert, BaseButton } from "@/components/index";
+import axios from "@/axios";
 
 export default {
   name: "courses",
   components: {
     Card,
     Modal,
+    BaseAlert,
+    BaseButton,
   },
   data() {
     return {
@@ -208,12 +188,17 @@ export default {
         title: "Cursos",
         subTitle: "Listagem de cursos",
         columns: ["Name", "Description", "Start Date", "End Date"],
-        data: courses,
+        data: [],
       },
       filters: {
         search: "",
         sortColumn: null,
         sortDirection: "asc",
+      },
+      alert: {
+        visible: false,
+        type: "success",
+        message: "",
       },
       perPage: 10,
       currentPage: 1,
@@ -268,19 +253,53 @@ export default {
     },
   },
   methods: {
+    loadCourses() {
+      axios
+        .get("/courses/list")
+        .then((response) => {
+          this.coursesTable.data = response.data;
+        })
+        .catch((error) => {
+          console.error("Não foi possível carregar os cursos.", error);
+        });
+    },
+    showAlert(message, type = "success") {
+      this.alert.message = message;
+      this.alert.type = type;
+      this.alert.visible = true;
+      setTimeout(() => {
+        this.alert.visible = false;
+      }, 3000);
+    },
+    formatDate(date) {
+      return new Date(date).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    },
     viewCourse(course) {
       this.selectedCourse = course;
       this.modals.viewCourse = true;
     },
     editCourse(course) {
       // Implement edit course action
+      this.showAlert(`Curso ${course.name} editado com sucesso!`, "info");
     },
     deleteCourse(course) {
-      // Implement delete course action
-      this.coursesTable.data = this.coursesTable.data.filter(
-        (u) => u.id !== course.id
-      );
-      this.modals.confirmDelete = false;
+      axios
+        .delete(`/courses/delete/${course.id}`)
+        .then(() => {
+          this.coursesTable.data = this.coursesTable.data.filter(
+            (u) => u.id !== course.id
+          );
+          this.modals.confirmDelete = false;
+          this.showAlert("Curso excluído com sucesso!", "success");
+        })
+        .catch((error) => {
+          console.error("Erro ao tentar remover um curso", error);
+          this.showAlert("Erro ao excluir um curso", "danger");
+        });
     },
     confirmDeleteCourse(course) {
       this.selectedCourse = course;
@@ -323,6 +342,9 @@ export default {
       }
       return "fa-sort";
     },
+  },
+  mounted() {
+    this.loadCourses();
   },
 };
 </script>

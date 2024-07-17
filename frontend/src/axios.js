@@ -1,11 +1,10 @@
 import axios from "axios";
-
-// Configuração base do Axios
 const instance = axios.create({
   baseURL: "http://lettiere.app.br/api",
   headers: {
     "Content-Type": "application/json",
   },
+  origins: ["http://localhost:8081"],
 });
 
 // Interceptor de requisições para adicionar o token de autenticação

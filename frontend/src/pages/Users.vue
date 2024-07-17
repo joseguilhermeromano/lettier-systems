@@ -1,5 +1,15 @@
 <template>
   <div class="content">
+    <!-- Alerta de Notificação no Topo -->
+    <base-alert
+      v-if="alert.visible"
+      :type="alert.type"
+      dismissible
+      @dismiss="alert.visible = false"
+      class="alert-top"
+    >
+      {{ alert.message }}
+    </base-alert>
     <div class="container-fluid">
       <div class="row">
         <div class="col-12">
@@ -30,9 +40,6 @@
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th @click="setSortColumn('name')">
-                      Nome <i class="fas" :class="sortIcon('name')"></i>
-                    </th>
                     <th @click="setSortColumn('email')">
                       Email <i class="fas" :class="sortIcon('email')"></i>
                     </th>
@@ -45,9 +52,8 @@
                 </thead>
                 <tbody>
                   <tr v-for="user in paginatedUsers" :key="user.id">
-                    <td>{{ user.name }}</td>
                     <td>{{ user.email }}</td>
-                    <td>{{ user.creationDate }}</td>
+                    <td>{{ formatDate(user.created_at) }}</td>
                     <td class="text-center">
                       <a href="#" @click.prevent="viewUser(user)">
                         <i
@@ -135,9 +141,11 @@
         <h5 class="modal-title">Detalhes do Usuário</h5>
       </template>
       <div v-if="selectedUser">
-        <p><strong>Nome:</strong> {{ selectedUser.name }}</p>
         <p><strong>Email:</strong> {{ selectedUser.email }}</p>
-        <p><strong>Data de Criação:</strong> {{ selectedUser.creationDate }}</p>
+        <p>
+          <strong>Data de Criação:</strong>
+          {{ formatDate(selectedUser.created_at) }}
+        </p>
       </div>
       <template slot="footer">
         <base-button type="secondary" @click="modals.viewUser = false"
@@ -149,105 +157,14 @@
 </template>
 
 <script>
-import { Card, Modal } from "@/components/index";
-
-const users = [
-  {
-    id: 1,
-    name: "João da Silva",
-    email: "joao@silva.com",
-    creationDate: "2020-01-01 10:00:00",
-  },
-  {
-    id: 2,
-    name: "Maria da Costa",
-    email: "maria@costa.com",
-    creationDate: "2020-01-02 11:00:00",
-  },
-  {
-    id: 3,
-    name: "Pedro da Cunha",
-    email: "pedro@cunha.com",
-    creationDate: "2020-01-03 12:00:00",
-  },
-  {
-    id: 4,
-    name: "Ana da Silva",
-    email: "ana@silva.com",
-    creationDate: "2020-01-04 13:00:00",
-  },
-  {
-    id: 5,
-    name: "José da Costa",
-    email: "jose@costa.com",
-    creationDate: "2020-01-05 14:00:00",
-  },
-  {
-    id: 6,
-    name: "Carlos Pereira",
-    email: "carlos@pereira.com",
-    creationDate: "2020-01-06 15:00:00",
-  },
-  {
-    id: 7,
-    name: "Fernanda Souza",
-    email: "fernanda@souza.com",
-    creationDate: "2020-01-07 16:00:00",
-  },
-  {
-    id: 8,
-    name: "Paulo Oliveira",
-    email: "paulo@oliveira.com",
-    creationDate: "2020-01-08 17:00:00",
-  },
-  {
-    id: 9,
-    name: "Juliana Mendes",
-    email: "juliana@mendes.com",
-    creationDate: "2020-01-09 18:00:00",
-  },
-  {
-    id: 10,
-    name: "Ricardo Lima",
-    email: "ricardo@lima.com",
-    creationDate: "2020-01-10 19:00:00",
-  },
-  {
-    id: 11,
-    name: "Rafaela Campos",
-    email: "rafaela@campos.com",
-    creationDate: "2020-01-11 20:00:00",
-  },
-  {
-    id: 12,
-    name: "Mariana Rocha",
-    email: "mariana@rocha.com",
-    creationDate: "2020-01-12 21:00:00",
-  },
-  {
-    id: 13,
-    name: "Gustavo Ribeiro",
-    email: "gustavo@ribeiro.com",
-    creationDate: "2020-01-13 22:00:00",
-  },
-  {
-    id: 14,
-    name: "Patrícia Silva",
-    email: "patricia@silva.com",
-    creationDate: "2020-01-14 23:00:00",
-  },
-  {
-    id: 15,
-    name: "Roberto Almeida",
-    email: "roberto@almeida.com",
-    creationDate: "2020-01-15 24:00:00",
-  },
-];
+import { Card, BaseAlert, Modal } from "@/components/index";
+import axios from "@/axios";
 
 export default {
   name: "users",
   components: {
     Card,
+    BaseAlert,
     Modal,
   },
   data() {
@@ -255,13 +172,18 @@ export default {
       usersTable: {
         title: "Usuários",
         subTitle: "Listagem de usuários",
-        columns: ["Name", "Email", "Creation Date"],
-        data: users,
+        columns: ["Email", "Creation Date"],
+        data: [],
       },
       filters: {
         search: "",
         sortColumn: null,
         sortDirection: "asc",
+      },
+      alert: {
+        visible: false,
+        type: "success",
+        message: "",
       },
       perPage: 10,
       currentPage: 1,
@@ -313,6 +235,31 @@ export default {
     },
   },
   methods: {
+    loadUsers() {
+      axios
+        .get("/users/list")
+        .then((response) => {
+          this.usersTable.data = response.data;
+        })
+        .catch((error) => {
+          console.error("Não foi possível carregar os usuários.", error);
+        });
+    },
+    showAlert(message, type = "success") {
+      this.alert.message = message;
+      this.alert.type = type;
+      this.alert.visible = true;
+      setTimeout(() => {
+        this.alert.visible = false;
+      }, 3000);
+    },
+    formatDate(date) {
+      return new Date(date).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    },
     viewUser(user) {
       this.selectedUser = user;
       this.modals.viewUser = true;
@@ -321,11 +268,19 @@ export default {
       // Implement edit user action
     },
     deleteUser(user) {
-      // Implement delete user action
-      this.usersTable.data = this.usersTable.data.filter(
-        (u) => u.id !== user.id
-      );
-      this.modals.confirmDelete = false;
+      axios
+        .delete(`/users/delete/${user.id}`)
+        .then(() => {
+          this.usersTable.data = this.usersTable.data.filter(
+            (u) => u.id !== user.id
+          );
+          this.modals.confirmDelete = false;
+          this.showAlert("Usuário excluído com sucesso!", "success");
+        })
+        .catch((error) => {
+          console.error("Erro ao tentar remover um usuário", error);
+          this.showAlert("Erro ao excluir um usuário", "danger");
+        });
     },
     confirmDeleteUser(user) {
       this.selectedUser = user;
@@ -368,6 +323,9 @@ export default {
       }
       return "fa-sort";
     },
+  },
+  mounted() {
+    this.loadUsers();
   },
 };
 </script>

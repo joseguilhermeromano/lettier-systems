@@ -10,8 +10,8 @@ class AuthFilter implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        $session = session();
-        if (!$session->has('isLoggedIn') || !$session->get('isLoggedIn')) {
+        $session = \Config\Services::session();
+        if (!$session->has('isLoggedIn') && !empty($request->path)) {
             $response = service('response');
             $response->setStatusCode(401);
             $response->setJSON(['success' => false, 'message' => 'Unauthorized']);
@@ -21,6 +21,6 @@ class AuthFilter implements FilterInterface
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        // Do something here
+        // No actions after the request
     }
 }

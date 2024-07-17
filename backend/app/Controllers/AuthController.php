@@ -6,15 +6,22 @@ use App\Models\UserModel;
 use App\Models\TokenModel;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
-use \Firebase\JWT\JWT;
 
 class AuthController extends ResourceController
 {
     use ResponseTrait;
 
+    protected $session;
+
+    public function __construct()
+    {
+        $this->session = \Config\Services::session();
+        $this->session->start();
+    }
+
     public function index()
     {
-        return $this->respond(['success' => true, "message" => "Seja bem vindo a API Lettier! Feito com carinho por José Romano!"], 200);
+        return $this->respond(['success' => true, "message" => "Seja bem-vindo à API Lettier! Feito com carinho por José Romano!"], 200);
     }
 
     public function register()
@@ -41,7 +48,6 @@ class AuthController extends ResourceController
 
     public function login()
     {
-        $session = session();
         $rules = [
             'email'    => 'required|valid_email',
             'password' => 'required|min_length[6]'
@@ -63,7 +69,7 @@ class AuthController extends ResourceController
             'email' => $user['email'],
             'isLoggedIn' => true
         ];
-        $session->set($ses_data);
+        $this->session->set($ses_data);
 
         $token = bin2hex(random_bytes(64));
         $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
@@ -88,12 +94,9 @@ class AuthController extends ResourceController
         return $this->respond(['token' => $token, 'expires_at' => $expires_at]);
     }
 
-    //crie o método logout
     public function logout()
     {
-        $session = session();
-
-        $session->destroy();
+        $this->session->destroy();
 
         $authHeader = $this->request->header('Authorization');
         if (!$authHeader) {

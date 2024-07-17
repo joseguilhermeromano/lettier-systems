@@ -1,5 +1,16 @@
 <template>
   <div class="content">
+    <!-- Alerta de Notificação no Topo -->
+    <base-alert
+      v-if="alert.visible"
+      :type="alert.type"
+      dismissible
+      @dismiss="alert.visible = false"
+      class="alert-top"
+    >
+      {{ alert.message }}
+    </base-alert>
+
     <div class="container-fluid">
       <div class="row">
         <div class="col-12">
@@ -57,10 +68,10 @@
                   <tr v-for="student in paginatedStudents" :key="student.id">
                     <td>{{ student.name }}</td>
                     <td>{{ student.email }}</td>
-                    <td>{{ student.cpf }}</td>
-                    <td>{{ student.birthday }}</td>
-                    <td>{{ student.gender }}</td>
-                    <td>{{ student.phone_number }}</td>
+                    <td>{{ formatCPF(student.cpf) }}</td>
+                    <td>{{ formatDate(student.birthday) }}</td>
+                    <td>{{ translateGender(student.gender) }}</td>
+                    <td>{{ formatPhone(student.phone_number) }}</td>
                     <td class="text-center">
                       <a href="#" @click.prevent="viewStudent(student)">
                         <i
@@ -153,12 +164,18 @@
       <div v-if="selectedStudent">
         <p><strong>Nome:</strong> {{ selectedStudent.name }}</p>
         <p><strong>Email:</strong> {{ selectedStudent.email }}</p>
-        <p><strong>CPF:</strong> {{ selectedStudent.cpf }}</p>
+        <p><strong>CPF:</strong> {{ formatCPF(selectedStudent.cpf) }}</p>
         <p>
-          <strong>Data de Nascimento:</strong> {{ selectedStudent.birthday }}
+          <strong>Data de Nascimento:</strong>
+          {{ formatDate(selectedStudent.birthday) }}
         </p>
-        <p><strong>Gênero:</strong> {{ selectedStudent.gender }}</p>
-        <p><strong>Telefone:</strong> {{ selectedStudent.phone_number }}</p>
+        <p>
+          <strong>Gênero:</strong> {{ translateGender(selectedStudent.gender) }}
+        </p>
+        <p>
+          <strong>Telefone:</strong>
+          {{ formatPhone(selectedStudent.phone_number) }}
+        </p>
       </div>
       <template slot="footer">
         <base-button type="secondary" @click="modals.viewStudent = false"
@@ -171,150 +188,15 @@
 
 <script>
 import { Card, Modal } from "@/components/index";
-
-const students = [
-  {
-    id: 1,
-    name: "João da Silva",
-    email: "joao@silva.com",
-    cpf: "123.456.789-00",
-    birthday: "2000-01-01",
-    gender: "Masculino",
-    phone_number: "(11) 1234-5678",
-  },
-  {
-    id: 2,
-    name: "Maria da Costa",
-    email: "maria@costa.com",
-    cpf: "234.567.890-11",
-    birthday: "2001-02-02",
-    gender: "Feminino",
-    phone_number: "(11) 2345-6789",
-  },
-  {
-    id: 3,
-    name: "Pedro da Cunha",
-    email: "pedro@cunha.com",
-    cpf: "345.678.901-22",
-    birthday: "2002-03-03",
-    gender: "Masculino",
-    phone_number: "(11) 3456-7890",
-  },
-  {
-    id: 4,
-    name: "Ana da Silva",
-    email: "ana@silva.com",
-    cpf: "456.789.012-33",
-    birthday: "2003-04-04",
-    gender: "Feminino",
-    phone_number: "(11) 4567-8901",
-  },
-  {
-    id: 5,
-    name: "José da Costa",
-    email: "jose@costa.com",
-    cpf: "567.890.123-44",
-    birthday: "2004-05-05",
-    gender: "Masculino",
-    phone_number: "(11) 5678-9012",
-  },
-  {
-    id: 6,
-    name: "Carlos Pereira",
-    email: "carlos@pereira.com",
-    cpf: "678.901.234-55",
-    birthday: "2005-06-06",
-    gender: "Masculino",
-    phone_number: "(11) 6789-0123",
-  },
-  {
-    id: 7,
-    name: "Fernanda Souza",
-    email: "fernanda@souza.com",
-    cpf: "789.012.345-66",
-    birthday: "2006-07-07",
-    gender: "Feminino",
-    phone_number: "(11) 7890-1234",
-  },
-  {
-    id: 8,
-    name: "Paulo Oliveira",
-    email: "paulo@oliveira.com",
-    cpf: "890.123.456-77",
-    birthday: "2007-08-08",
-    gender: "Masculino",
-    phone_number: "(11) 8901-2345",
-  },
-  {
-    id: 9,
-    name: "Juliana Mendes",
-    email: "juliana@mendes.com",
-    cpf: "901.234.567-88",
-    birthday: "2008-09-09",
-    gender: "Feminino",
-    phone_number: "(11) 9012-3456",
-  },
-  {
-    id: 10,
-    name: "Ricardo Lima",
-    email: "ricardo@lima.com",
-    cpf: "012.345.678-99",
-    birthday: "2009-10-10",
-    gender: "Masculino",
-    phone_number: "(11) 0123-4567",
-  },
-  {
-    id: 11,
-    name: "Rafaela Campos",
-    email: "rafaela@campos.com",
-    cpf: "123.456.789-00",
-    birthday: "2010-11-11",
-    gender: "Feminino",
-    phone_number: "(11) 1234-5678",
-  },
-  {
-    id: 12,
-    name: "Mariana Rocha",
-    email: "mariana@rocha.com",
-    cpf: "234.567.890-11",
-    birthday: "2011-12-12",
-    gender: "Feminino",
-    phone_number: "(11) 2345-6789",
-  },
-  {
-    id: 13,
-    name: "Gustavo Ribeiro",
-    email: "gustavo@ribeiro.com",
-    cpf: "345.678.901-22",
-    birthday: "2012-01-01",
-    gender: "Masculino",
-    phone_number: "(11) 3456-7890",
-  },
-  {
-    id: 14,
-    name: "Patrícia Silva",
-    email: "patricia@silva.com",
-    cpf: "456.789.012-33",
-    birthday: "2013-02-02",
-    gender: "Feminino",
-    phone_number: "(11) 4567-8901",
-  },
-  {
-    id: 15,
-    name: "Roberto Almeida",
-    email: "roberto@almeida.com",
-    cpf: "567.890.123-44",
-    birthday: "2014-03-03",
-    gender: "Masculino",
-    phone_number: "(11) 5678-9012",
-  },
-];
+import BaseAlert from "@/components/BaseAlert.vue";
+import axios from "@/axios";
 
 export default {
   name: "students",
   components: {
     Card,
     Modal,
+    BaseAlert,
   },
   data() {
     return {
@@ -322,7 +204,7 @@ export default {
         title: "Estudantes",
         subTitle: "Listagem de estudantes",
         columns: ["Name", "Email", "CPF", "Birthday", "Gender", "Phone Number"],
-        data: students,
+        data: [],
       },
       filters: {
         search: "",
@@ -336,6 +218,11 @@ export default {
         viewStudent: false,
       },
       selectedStudent: null,
+      alert: {
+        visible: false,
+        message: "",
+        type: "success",
+      },
     };
   },
   computed: {
@@ -388,6 +275,14 @@ export default {
     },
   },
   methods: {
+    async listStudents() {
+      try {
+        const response = await axios.get("/students/list");
+        this.studentsTable.data = response.data;
+      } catch (error) {
+        console.error("Erro ao listar os estudantes:", error);
+      }
+    },
     viewStudent(student) {
       this.selectedStudent = student;
       this.modals.viewStudent = true;
@@ -395,12 +290,21 @@ export default {
     editStudent(student) {
       // Implement edit student action
     },
-    deleteStudent(student) {
+    async deleteStudent(student) {
       // Implement delete student action
       this.studentsTable.data = this.studentsTable.data.filter(
         (u) => u.id !== student.id
       );
       this.modals.confirmDelete = false;
+
+      try {
+        const response = await axios.delete("/students/delete/" + student.id);
+        if (response.data.id) {
+          this.showAlert("Estudante removido com sucesso!", "success");
+        }
+      } catch (error) {
+        this.showAlert("Erro ao remover estudante", "error");
+      }
     },
     confirmDeleteStudent(student) {
       this.selectedStudent = student;
@@ -443,11 +347,50 @@ export default {
       }
       return "fa-sort";
     },
+    showAlert(message, type) {
+      this.alert.message = message;
+      this.alert.type = type;
+      this.alert.visible = true;
+      setTimeout(() => {
+        this.alert.visible = false;
+      }, 3000);
+    },
+    formatCPF(cpf) {
+      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    },
+    formatPhone(phone) {
+      return phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    },
+    formatDate(date) {
+      return new Date(date).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    },
+    translateGender(gender) {
+      const genderMap = {
+        male: "Masculino",
+        female: "Feminino",
+        other: "Outro",
+      };
+      return genderMap[gender] || gender;
+    },
+  },
+  mounted() {
+    this.listStudents();
   },
 };
 </script>
 
 <style scoped>
+.alert-top {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
 .pagination {
   justify-content: center;
 }

@@ -1,5 +1,6 @@
 import VueRouter from "vue-router";
 import routes from "./routes";
+import WebSocket from "ws";
 
 // configure router
 const router = new VueRouter({
@@ -17,6 +18,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("token");
+
   if (to.matched.some((record) => record.meta.requiresAuth) && !token) {
     next({ name: "login" });
   } else {
